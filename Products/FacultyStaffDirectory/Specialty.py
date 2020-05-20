@@ -5,7 +5,6 @@ __docformat__ = 'plaintext'
 
 from AccessControl import ClassSecurityInfo
 from Products.Archetypes import atapi
-from archetypes.referencebrowserwidget.widget import ReferenceBrowserWidget
 from Products.Relations.field import RelationField
 from Products.FacultyStaffDirectory import config
 from Products.FacultyStaffDirectory.PersonGrouping import PersonGrouping
@@ -28,14 +27,26 @@ schema = atapi.Schema((
 
     RelationField(
         name='people',
-        widget=ReferenceBrowserWidget(
-            label=_(u"FacultyStaffDirectory_label_people", default=u"People"),
-            i18n_domain='FacultyStaffDirectory',
-            allow_browse=0,
-            allow_search=1,
-            show_results_without_query=1,
-            base_query="_search_people_in_this_fsd",
-            startup_directory_method="_get_parent_fsd_path",
+        widget = atapi.RelatedItemsWidget(
+            allow_search = True,
+            allow_browse = True,
+            show_indexes = False,
+            force_close_on_insert = True,
+            label = u"People",
+            label_msgid = "FacultyStaffDirectory_label_people",
+            i18n_domain = "FacultyStaffDirectory",
+            visible = {'edit' : 'visible', 'view' : 'visible' },
+            pattern_options={
+                'baseCriteria': [{
+                    'i': 'portal_type',
+                    'o': 'plone.app.querystring.operation.string.is',
+                    'v': 'FSDPerson',
+                }],
+                'basePath': '',
+                "contextPath": None,
+                'selectableTypes': ['FSDPerson', ],
+                'placeholder': _(u'Begin typing a name'),
+            },
         ),
         write_permission=ASSIGN_SPECIALTIES_TO_PEOPLE,
         allowed_types=('FSDPerson',),

@@ -39,7 +39,6 @@ from Products.membrane.at.interfaces import IPropertiesProvider
 from Products.membrane.at.interfaces import IUserAuthProvider
 from Products.membrane.at.interfaces import IUserChanger
 from Products.validation import validation
-from archetypes.referencebrowserwidget.widget import ReferenceBrowserWidget
 from plone.app.layout.navigation.navtree import buildFolderTree
 from sha import sha
 from zope.annotation.interfaces import IAttributeAnnotatable, IAnnotations
@@ -253,10 +252,26 @@ schema = ATContentTypeSchema.copy() + atapi.Schema((
     RelationField(
         name='classifications',
         vocabulary="_classificationReferences",
-        widget=atapi.ReferenceWidget
-        (
-            label=_(u"FacultyStaffDirectory_label_classifications", default=u"Classifications"),
-            i18n_domain='FacultyStaffDirectory',
+        widget = atapi.RelatedItemsWidget(
+            allow_search = True,
+            allow_browse = True,
+            show_indexes = False,
+            force_close_on_insert = True,
+            label = u"Classifications",
+            label_msgid = "FacultyStaffDirectory_label_classifications",
+            i18n_domain = "FacultyStaffDirectory",
+            visible = {'edit' : 'visible', 'view' : 'visible' },
+            pattern_options={
+                'baseCriteria': [{
+                    'i': 'portal_type',
+                    'o': 'plone.app.querystring.operation.string.is',
+                    'v': 'FSDClassification',
+                }],
+                'basePath': '',
+                "contextPath": None,
+                'selectableTypes': ['FSDClassification', ],
+                'placeholder': _(u'Begin typing a name'),
+            },
         ),
         write_permission=ASSIGN_CLASSIFICATIONS_TO_PEOPLE,
         schemata="Basic Information",
@@ -266,14 +281,26 @@ schema = ATContentTypeSchema.copy() + atapi.Schema((
 
     RelationField(
         name='departments',
-        widget=ReferenceBrowserWidget(
-            label=_(u"FacultyStaffDirectory_label_departments", default=u"Departments"),
-            i18n_domain='FacultyStaffDirectory',
-            base_query="_search_departments_in_this_fsd",
-            allow_browse=0,
-            allow_search=1,
-            show_results_without_query=1,
-            startup_directory_method="_get_parent_fsd_path",
+        widget = atapi.RelatedItemsWidget(
+            allow_search = True,
+            allow_browse = True,
+            show_indexes = False,
+            force_close_on_insert = True,
+            label = u"Departments",
+            label_msgid = "FacultyStaffDirectory_label_departments",
+            i18n_domain = "FacultyStaffDirectory",
+            visible = {'edit' : 'visible', 'view' : 'visible' },
+            pattern_options={
+                'baseCriteria': [{
+                    'i': 'portal_type',
+                    'o': 'plone.app.querystring.operation.string.is',
+                    'v': 'FSDDepartment',
+                }],
+                'basePath': '',
+                "contextPath": None,
+                'selectableTypes': ['FSDDepartment', ],
+                'placeholder': _(u'Begin typing a name'),
+            },
         ),
         write_permission=ASSIGN_DEPARTMENTS_TO_PEOPLE,
         schemata="Basic Information",
@@ -284,33 +311,56 @@ schema = ATContentTypeSchema.copy() + atapi.Schema((
 
     RelationField(
         name='committees',
-        widget=ReferenceBrowserWidget(
-            visible={'edit': 'visible', 'view': 'visible'},
-            label=_(u"FacultyStaffDirectory_label_committees", default=u"Committees"),
-            i18n_domain='FacultyStaffDirectory',
-            base_query="_search_committees_in_this_fsd",
-            allow_browse=0,
-            allow_search=1,
-            show_results_without_query=1,
-            startup_directory_method="_get_parent_fsd_path",
+        widget = atapi.RelatedItemsWidget(
+            allow_search = True,
+            allow_browse = True,
+            show_indexes = False,
+            force_close_on_insert = True,
+            label = u"Committees",
+            label_msgid = "FacultyStaffDirectory_label_committees",
+            i18n_domain = "FacultyStaffDirectory",
+            visible = {'edit' : 'visible', 'view' : 'visible' },
+            pattern_options={
+                'baseCriteria': [{
+                    'i': 'portal_type',
+                    'o': 'plone.app.querystring.operation.string.is',
+                    'v': 'FSDCommittee',
+                }],
+                'basePath': '',
+                "contextPath": None,
+                'selectableTypes': ['FSDCommittee', ],
+                'placeholder': _(u'Begin typing a name'),
+            },
         ),
         write_permission=ASSIGN_COMMITTIES_TO_PEOPLE,
         schemata="Professional Information",
         multiValued=True,
         relationship='members_committees',
-        allowed_types=('Committee')
+        allowed_types=('FSDCommittee')
     ),
 
     RelationField(
         name='specialties',
-        widget=ReferenceBrowserWidget(
-            label=_(u"FacultyStaffDirectory_label_specialties", default=u"Specialties"),
-            i18n_domain='FacultyStaffDirectory',
-            base_query="_search_specialties_in_this_fsd",
-            allow_browse=0,
-            allow_search=1,
-            show_results_without_query=1,
-            startup_directory_method="_get_parent_fsd_path"
+        widget = atapi.RelatedItemsWidget(
+            allow_search = True,
+            allow_browse = True,
+            show_indexes = False,
+            force_close_on_insert = True,
+            label = u"Specialties",
+            label_msgid = "FacultyStaffDirectory_label_specialties",
+            i18n_domain = "FacultyStaffDirectory",
+            visible = {'edit' : 'visible', 'view' : 'visible' },
+            pattern_options={
+                'baseCriteria': [{
+                    'i': 'portal_type',
+                    'o': 'plone.app.querystring.operation.string.is',
+                    'v': 'FSDSpecialty',
+                }],
+                'basePath': '',
+                "contextPath": None,
+                'selectableTypes': ['FSDSpecialty', ],
+                'placeholder': _(u'Begin typing a name'),
+            },
         ),
         write_permission=ASSIGN_SPECIALTIES_TO_PEOPLE,
         schemata="Professional Information",
@@ -432,18 +482,26 @@ schema = ATContentTypeSchema.copy() + atapi.Schema((
 
     RelationField(
         name='assistants',
-        widget=ReferenceBrowserWidget
-        (
-            label=_(u"FacultyStaffDirectory_label_assistants", default=u"Personal Assistant(s)"),
-            description=_(u"FacultyStaffDirectory_description_assistants",
-                          default=u"Assistants can edit your directory entry."),
-            i18n_domain='FacultyStaffDirectory',
-            allow_browse=0,
-            allow_search=1,
-            show_results_without_query=1,
-            startup_directory_method="_get_parent_fsd_path",
-            base_query="_search_people_in_this_fsd",
-            restrict_browsing_to_startup_directory=True,
+        widget = atapi.RelatedItemsWidget(
+            allow_search = True,
+            allow_browse = True,
+            show_indexes = False,
+            force_close_on_insert = True,
+            label = u"Personal Assistant(s)",
+            label_msgid = "FacultyStaffDirectory_label_assistants",
+            i18n_domain = "FacultyStaffDirectory",
+            visible = {'edit' : 'visible', 'view' : 'visible' },
+            pattern_options={
+                'baseCriteria': [{
+                    'i': 'portal_type',
+                    'o': 'plone.app.querystring.operation.string.is',
+                    'v': 'FSDPerson',
+                }],
+                'basePath': '',
+                "contextPath": None,
+                'selectableTypes': ['FSDPerson', ],
+                'placeholder': _(u'Begin typing a name'),
+            },
         ),
         write_permission="Modify portal content",
         schemata="Basic Information",
